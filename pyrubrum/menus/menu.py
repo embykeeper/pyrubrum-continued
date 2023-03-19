@@ -292,7 +292,7 @@ class Menu(BaseMenu):
                 Keyboard(
                     keyboard,
                     handler,
-                    str(context.message_id) + str(context.from_user.id),
+                    str(context.id) + str(context.from_user.id),
                     context.chat.id,
                 )
                 if keyboard
