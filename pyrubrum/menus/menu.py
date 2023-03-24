@@ -16,19 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Pyrubrum. If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Any, Callable, Dict, Optional, Union
+from asyncio import iscoroutinefunction
+from typing import Any, Callable, Dict, Iterable, Optional, Union
 
 from pyrogram import Client
 from pyrogram.filters import Filter
-from pyrogram.types import (
-    CallbackQuery,
-    InlineKeyboardMarkup,
-    InputMedia,
-    Message,
-)
-
+from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, InputMedia, Message
 from pyrubrum.keyboard import Keyboard
-from pyrubrum.menus.styles import BaseStyle, MenuStyle
+from pyrubrum.menus.styles import MenuStyle
 from pyrubrum.types import Types
 
 from .base_menu import BaseMenu
@@ -111,7 +106,7 @@ class Menu(BaseMenu):
         default: Optional[bool] = False,
         message_filter: Optional[Filter] = None,
         preliminary: Types.Preliminary = None,
-        style: BaseStyle = MenuStyle(),
+        style: MenuStyle = MenuStyle(),
         **kwargs
     ):
         BaseMenu.__init__(self, name, menu_id)
@@ -121,146 +116,80 @@ class Menu(BaseMenu):
         self.message_filter = message_filter
         self.preliminary = preliminary
         self.style = style
+        self.kwargs = kwargs
 
-        for argument in kwargs:
-            if not hasattr(self, argument):
-                setattr(self, argument, kwargs[argument])
+    @staticmethod
+    async def parse(var, handler, client, context, parameters):
+        if iscoroutinefunction(var):
+            return await var(handler, client, context, parameters)
+        elif callable(var):
+            return var(handler, client, context, parameters)
+        else:
+            return var
 
-    def get_content(
+    async def call_preliminary(
         self,
         handler: "Handler",  # noqa
         client: Client,
         context: Union[CallbackQuery, Message],
         parameters: Optional[Dict[str, Any]] = None,
-    ) -> Union[InputMedia, str]:
-        """Get the content which will be displayed to the user.
+    ):
+        if self.preliminary:
+            preliminary = (
+                [self.preliminary] if not isinstance(self.preliminary, Iterable) else self.preliminary
+            )
+            for func in preliminary:
+                if iscoroutinefunction(func):
+                    await func(self, handler, client, context, parameters)
+                elif callable(func):
+                    func(self, handler, client, context, parameters)
 
-        Parameters:
-            handler (BaseHandler): The handler which coordinates the management
-                of the menus.
-            client (Client): The client which is linked to the handler.
-            context (Union[CallbackQuery, Message]): The context for which the
-                button is generated.
-            parameters (Optional[Dict[str, Any]]): The parameters which were
-                passed to the handler. Defaults to ``None``.
+    async def on_update(
+        self,
+        handler: "Handler",  # noqa
+        client: Client,
+        context: Union[CallbackQuery, Message],
+        parameters: Optional[Dict[str, Any]] = None,
+    ):
+        await self.call_preliminary(handler, client, context, parameters)
 
-        Returns:
-            Union[InputMedia, str]: The content of the menu, which is then
-            displayed to the user as a media (if it is a subclass of
-            `pyrogram.InputMedia`) or a message (if it is just a string).
-        """
-        if callable(self.content):
-            if isinstance(parameters, dict):
-                return self.content(handler, client, context, parameters)
+        keyboard = await self.keyboard(handler, client, context, parameters)
+        content = await self.parse(self.content, handler, client, context, parameters)
+        if not content:
+            return
+
+        if isinstance(context, Message):
+            if isinstance(content, InputMedia):
+                await context.reply_cached_media(
+                    file_id=content.media, caption=content.caption, reply_markup=keyboard, **self.kwargs
+                )
             else:
-                return self.content(handler, client, context)
+                await context.reply_text(content, reply_markup=keyboard, **self.kwargs)
+        elif isinstance(context, CallbackQuery):
+            if isinstance(content, InputMedia):
+                await context.edit_message_media(content, reply_markup=keyboard, **self.kwargs)
+            else:
+                await context.edit_message_text(content, reply_markup=keyboard, **self.kwargs)
 
-        return self.content
-
-    def on_callback(
+    async def on_callback(
         self,
         handler: "Handler",  # noqa
         client: Client,
-        callback: CallbackQuery,
+        context: Union[CallbackQuery, Message],
         parameters: Optional[Dict[str, Any]] = None,
     ):
-        """Each time a callback query is handled, this function calls the preliminary
-        function (i.e. `Menu.preliminary`), if callable, then gets the content
-        that is going to be provided to the user (both text and media are
-        compatible), sets up an inline keyboard using the style defined in
-        `Menu.style` and finally edits the message with
-        `CallbackQuery.edit_message_text` (if the content is a string, i.e. a
-        text) or `CallbackQuery.edit_message_media`
-        (if the content is an instance of `pyrogram.InputMedia`, i.e. a media).
+        return await self.on_update(handler, client, context, parameters)
 
-        Parameters:
-            handler (BaseHandler): The handler which coordinates the management
-                of the menus.
-            client (Client): The client which is linked to the handler.
-            context (CallbackQuery): The callback query for which the button is
-                generated.
-            parameters (Optional[Dict[str, Any]]): The parameters which were
-                passed to the handler. Defaults to ``None``.
-        """
-
-        if callable(self.preliminary):
-            self.preliminary(handler, client, callback, parameters)
-        elif isinstance(self.preliminary, list):
-            for func in self.preliminary:
-                func(handler, client, callback, parameters)
-
-        content = self.get_content(handler, client, callback, parameters)
-
-        if isinstance(content, InputMedia):
-            callback.edit_message_media(
-                content,
-                reply_markup=self.keyboard(
-                    handler, client, callback, parameters
-                ),
-            )
-        elif isinstance(content, str):
-            callback.edit_message_text(
-                content,
-                reply_markup=self.keyboard(
-                    handler, client, callback, parameters
-                ),
-            )
-        else:
-            raise TypeError("content must be of type InputMedia or str")
-
-    def on_message(
+    async def on_message(
         self,
         handler: "Handler",  # noqa
         client: Client,
-        message: Message,
+        context: Union[CallbackQuery, Message],
         parameters: Optional[Dict[str, Any]] = None,
     ):
-        """Each time a message is handled, this function calls the preliminary
-        function (i.e. `Menu.preliminary`), if callable, then gets the content
-        that is going to be provided to the user (both text and media are
-        compatible), sets up an inline keyboard using the style defined in
-        `Menu.style` and finally sends the message with `Message.reply_text`
-        (if the content is a string, i.e. a text) or
-        `Message.reply_cached_media` (if the content is an instance of
-        `pyrogram.InputMedia`, i.e. a media).
+        return await self.on_update(handler, client, context, parameters)
 
-        Parameters:
-            handler (BaseHandler): The handler which coordinates the management
-                of the menus.
-            client (Client): The client which is linked to the handler.
-            context (Message): The message for which the button is generated.
-            parameters (Optional[Dict[str, Any]]): The parameters which were
-                passed to the handler. Defaults to ``None``.
-        """
-
-        if callable(self.preliminary):
-            self.preliminary(handler, client, message, parameters)
-        elif isinstance(self.preliminary, list):
-            for func in self.preliminary:
-                func(handler, client, message, parameters)
-
-        content = self.get_content(handler, client, message, parameters)
-
-        if isinstance(content, InputMedia):
-            message.reply_cached_media(
-                file_id=content.media,
-                file_ref=content.file_ref,
-                caption=content.caption,
-                reply_markup=self.keyboard(
-                    handler, client, message, parameters
-                ),
-            )
-        elif isinstance(content, str):
-            message.reply_text(
-                content,
-                reply_markup=self.keyboard(
-                    handler, client, message, parameters
-                ),
-            )
-        else:
-            raise TypeError("content must be of type InputMedia or str")
-
-    def keyboard(
+    async def keyboard(
         self,
         handler: "Handler",  # noqa
         client: Client,
@@ -283,9 +212,7 @@ class Menu(BaseMenu):
             which is then displayed to the user.
         """
 
-        keyboard = self.style.generate(
-            handler, client, context, parameters, self
-        )
+        keyboard = await self.style.generate(handler, client, context, parameters, self)
 
         if isinstance(context, Message):
             return (
@@ -299,10 +226,4 @@ class Menu(BaseMenu):
                 else None
             )
         elif isinstance(context, CallbackQuery):
-            return (
-                Keyboard(
-                    keyboard, handler, context.id, context.message.chat.id
-                )
-                if keyboard
-                else None
-            )
+            return Keyboard(keyboard, handler, context.id, context.message.chat.id) if keyboard else None

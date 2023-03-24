@@ -39,14 +39,10 @@ def main(
     media_chat_id: int,
     session_name: str,
 ):
-    bot = Client(
-        session_name, api_hash=api_hash, api_id=api_id, bot_token=bot_token
-    )
+    bot = Client(session_name, api_hash=api_hash, api_id=api_id, bot_token=bot_token)
 
     with bot:
-        answer_image_id = InputMediaPhoto(
-            bot.send_photo(media_chat_id, answer_image_link).photo.file_id
-        )
+        answer_image_id = InputMediaPhoto(bot.send_photo(media_chat_id, answer_image_link).photo.file_id)
         forty_two_image_id = InputMediaPhoto(
             bot.send_photo(media_chat_id, forty_two_image_link).photo.file_id
         )

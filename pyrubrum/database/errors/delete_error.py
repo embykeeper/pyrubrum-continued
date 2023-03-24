@@ -25,6 +25,4 @@ class DeleteError(DatabaseError):
     """
 
     def __init__(self):
-        super().__init__(
-            "An error occured while deleting a key from the database"
-        )
+        super().__init__("An error occured while deleting a key from the database")

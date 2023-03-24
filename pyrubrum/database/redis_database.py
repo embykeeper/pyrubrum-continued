@@ -103,11 +103,7 @@ class RedisDatabase(BaseDatabase):
 
         if expire and not self.server.expire(key, expire):
             raise ExpireError
-        elif (
-            expire is not False
-            and self.default_expire
-            and not self.server.expire(key, self.default_expire)
-        ):
+        elif expire is not False and self.default_expire and not self.server.expire(key, self.default_expire):
             raise ExpireError
 
     def delete(self, key: str):

@@ -107,9 +107,7 @@ def main(
     session_name: str,
     tree: Set[Node],
 ):
-    bot = Client(
-        session_name, api_hash=api_hash, api_id=api_id, bot_token=bot_token
-    )
+    bot = Client(session_name, api_hash=api_hash, api_id=api_id, bot_token=bot_token)
 
     handler = ParameterizedHandler(tree, database)
     handler.setup(bot)

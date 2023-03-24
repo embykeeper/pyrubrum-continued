@@ -17,7 +17,7 @@
 # along with Pyrubrum. If not, see <https://www.gnu.org/licenses/>.
 
 from itertools import islice
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set, Union
 
 from pyrogram import Client
 
@@ -36,12 +36,20 @@ class MenuStyle(BaseStyle):
     """
 
     def __init__(
-        self, back_text: Optional[str] = "🔙", limit: Optional[int] = 2,
+        self,
+        back_text: Optional[str] = "🔙",
+        back_to: str = None,
+        back_enable: bool = True,
+        extras: List = [],
+        limit: Optional[int] = 2,
     ):
         self.back_text = back_text
+        self.back_to = back_to
+        self.back_enable = back_enable
+        self.extras = extras
         self.limit = limit
 
-    def generate(
+    async def generate(
         self,
         handler: "Handler",  # noqa
         client: Client,
@@ -77,9 +85,7 @@ class MenuStyle(BaseStyle):
                 iter(
                     lambda: list(
                         map(
-                            lambda child: child.button(
-                                handler, client, context, parameters
-                            ),
+                            lambda child: child.button(handler, client, context, parameters),
                             islice(iterable, self.limit),
                         )
                     ),
@@ -87,10 +93,16 @@ class MenuStyle(BaseStyle):
                 )
             )
 
-        if parent:
+        if self.back_to:
+            parent = handler[self.back_to]
+
+        if parent and self.back_enable:
             parent_button = parent.button(handler, client, context, parameters)
             parent_button.name = self.back_text
 
-            keyboard = keyboard + [[parent_button]]
+            extras = [handler[e] if isinstance(e, str) else e for e in self.extras]
+            buttons = [m.button(handler, client, context, parameters) for m in extras]
+
+            keyboard += [buttons, [parent_button]]
 
         return keyboard

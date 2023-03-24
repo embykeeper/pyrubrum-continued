@@ -16,24 +16,25 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Pyrubrum. If not, see <http://www.gnu.org/licenses/>.
 
+import pytest
 from pyrubrum import Menu
 
 
 class FakeContext:
     @staticmethod
-    def edit_message_media(*a, **b):
+    async def edit_message_media(*a, **b):
         pass
 
     @staticmethod
-    def edit_message_text(*a, **b):
+    async def edit_message_text(*a, **b):
         pass
 
     @staticmethod
-    def reply_cached_media(*a, **b):
+    async def reply_cached_media(*a, **b):
         pass
 
     @staticmethod
-    def reply_text(*a, **b):
+    async def reply_text(*a, **b):
         pass
 
 
@@ -47,42 +48,58 @@ context = FakeContext()
 handler = FakeHandler()
 
 
-def test_menu():
+@pytest.mark.asyncio
+async def test_menu():
     menu = Menu("Test", "test", "test_content")
-    menu.on_callback(handler, None, context)
-    menu.on_message(handler, None, context)
+    await menu.on_callback(handler, None, context)
+    await menu.on_message(handler, None, context)
 
 
-def test_menu_with_function():
+@pytest.mark.asyncio
+async def test_menu_with_function():
     worked = []
 
     def get_content(a, b, c, d=None):
         worked.append(1)
         return "test_content"
 
+    async def get_content_async(a, b, c, d=None):
+        worked.append(1)
+        return "test_content"
+
     menu = Menu("Test", "test", get_content)
-    menu.on_callback(handler, None, context)
-    menu.on_message(handler, None, context)
+    await menu.on_callback(handler, None, context)
+    await menu.on_message(handler, None, context)
+    menu = Menu("Test", "test", get_content_async)
+    await menu.on_callback(handler, None, context)
+    await menu.on_message(handler, None, context)
+    assert len(worked) == 4
 
-    assert len(worked) == 2
 
-
-def test_preliminary():
+@pytest.mark.asyncio
+async def test_preliminary():
     worked = []
 
     def preliminary(a, b, c, d=None):
         worked.append(1)
 
+    async def preliminary_async(a, b, c, d=None):
+        worked.append(1)
+
     menu = Menu("Test", "test", "test_content", preliminary=preliminary)
-    menu.on_callback(handler, None, context)
-    menu.on_message(handler, None, context)
+    await menu.on_callback(handler, None, context)
+    await menu.on_message(handler, None, context)
+
+    menu = Menu("Test", "test", "test_content", preliminary=preliminary_async)
+    await menu.on_callback(handler, None, context)
+    await menu.on_message(handler, None, context)
 
     menu = Menu("Test", "test", "test_content", preliminary=[preliminary] * 5)
-    menu.on_callback(handler, None, context)
-    menu.on_message(handler, None, context)
+    await menu.on_callback(handler, None, context)
+    await menu.on_message(handler, None, context)
 
     menu = Menu("Test", "test", "test_content", preliminary=None)
-    menu.on_callback(handler, None, context)
-    menu.on_message(handler, None, context)
+    await menu.on_callback(handler, None, context)
+    await menu.on_message(handler, None, context)
 
-    assert len(worked) == 12
+    assert len(worked) == 14

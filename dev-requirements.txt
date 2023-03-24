@@ -2,3 +2,4 @@ GitPython
 packaging
 pre-commit
 pytest
+pytest-asyncio

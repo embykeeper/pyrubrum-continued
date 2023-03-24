@@ -96,9 +96,7 @@ for example in filter(
 ):
     copyfile("../../examples/" + example, "_static/examples/" + example)
 
-    with open(
-        "examples/" + example.replace(".py", ".rst"), "w", encoding="utf-8"
-    ) as example_rst:
+    with open("examples/" + example.replace(".py", ".rst"), "w", encoding="utf-8") as example_rst:
         if example in EXAMPLE_TITLES:
             title = EXAMPLE_TITLES[example]
         else:

@@ -27,9 +27,7 @@ tree = transform(
     {
         Menu("Start", "start", "Hello!", default=True): [
             Menu("About me", "about_me", "I'm just a bot!"),
-            Menu(
-                "Thoughts", "thoughts", "I'm a bot, I cannot think properly..."
-            ),
+            Menu("Thoughts", "thoughts", "I'm a bot, I cannot think properly..."),
         ]
     }
 )
@@ -42,9 +40,7 @@ def main(
     session_name: str,
     tree: Set[Node],
 ):
-    bot = Client(
-        session_name, api_hash=api_hash, api_id=api_id, bot_token=bot_token
-    )
+    bot = Client(session_name, api_hash=api_hash, api_id=api_id, bot_token=bot_token)
     handler = Handler(tree)
     handler.setup(bot)
 

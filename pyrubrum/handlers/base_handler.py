@@ -90,9 +90,7 @@ class BaseHandler(ABC):
         return [
             [
                 (
-                    InlineKeyboardButton(
-                        button.name, callback_data=button.menu_id
-                    )
+                    InlineKeyboardButton(button.name, callback_data=button.menu_id)
                     if not button.link
                     else InlineKeyboardButton(button.name, url=button.link)
                 )
@@ -129,7 +127,8 @@ class BaseHandler(ABC):
 
 
 def pass_handler(
-    callback: Types.Callback, handler: BaseHandler,
+    callback: Types.Callback,
+    handler: BaseHandler,
 ) -> Types.PyrogramCallback:
     """Generate a function which, whenever it is called, subsequently calls
     `callback`, passing the handler from which this object was generated.
@@ -153,7 +152,7 @@ def pass_handler(
             callback(handler, client, context, parameters)
     """
 
-    def on_callback(client: Client, context):
-        callback(handler, client, context)
+    async def on_callback(client: Client, context):
+        await callback(handler, client, context)
 
     return on_callback

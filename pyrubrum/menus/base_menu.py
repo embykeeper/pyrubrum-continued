@@ -69,9 +69,7 @@ class BaseMenu(ABC):
         """
         return hash(self.menu_id)
 
-    def __init__(
-        self, name: str, menu_id: str, is_link: Optional[bool] = False
-    ):
+    def __init__(self, name: str, menu_id: str, is_link: Optional[bool] = False):
         self.is_link = is_link
         self.name = name
         self.menu_id = menu_id

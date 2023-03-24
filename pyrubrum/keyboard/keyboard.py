@@ -50,8 +50,4 @@ class Keyboard(InlineKeyboardMarkup):
         callback_query_id: str,
         chat_id: int,
     ):
-        super().__init__(
-            handler.process_keyboard(
-                inline_keyboard, callback_query_id, chat_id
-            )
-        )
+        super().__init__(handler.process_keyboard(inline_keyboard, callback_query_id, chat_id))

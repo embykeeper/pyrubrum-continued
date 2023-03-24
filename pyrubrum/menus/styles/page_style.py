@@ -16,12 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Pyrubrum. If not, see <https://www.gnu.org/licenses/>.
 
+from asyncio import iscoroutinefunction
 from itertools import islice
 from math import ceil
 from typing import Any, Dict, List, Optional
 
 from pyrogram import Client
-
 from pyrubrum.handlers.base_handler import NULL_POINTER
 from pyrubrum.keyboard.button import Button
 
@@ -62,6 +62,9 @@ class PageStyle(BaseStyle):
     def __init__(
         self,
         back_text: Optional[str] = "🔙",
+        back_to: str = None,
+        back_enable: bool = True,
+        extras: List = [],
         limit: Optional[int] = 2,
         limit_items: Optional[int] = 4,
         next_page_text: Optional[str] = "▶️",
@@ -70,6 +73,9 @@ class PageStyle(BaseStyle):
         show_page: Optional[bool] = True,
     ):
         self.back_text = back_text
+        self.back_to = back_to
+        self.back_enable = back_enable
+        self.extras = extras
         self.limit = limit
         self.limit_items = limit_items
         self.next_page_text = next_page_text
@@ -117,7 +123,7 @@ class PageStyle(BaseStyle):
 
         return page_id
 
-    def generate(
+    async def generate(
         self,
         handler: "ParameterizedHandler",  # noqa
         client: Client,
@@ -169,9 +175,7 @@ class PageStyle(BaseStyle):
             List[List[Button]]: The generated inline keyboard, which is then
             displayed to the user.
         """
-        page_id = self.generate_page_id(
-            handler, client, context, parameters, menu
-        )
+        page_id = self.generate_page_id(handler, client, context, parameters, menu)
 
         parent, children = handler.get_family(menu.menu_id)
 
@@ -181,16 +185,16 @@ class PageStyle(BaseStyle):
             iterable = iter(children)
             page_item_menu = next(iterable)
 
-            if callable(menu.items):
+            if iscoroutinefunction(menu.items):
+                items = await menu.items(handler, client, context, parameters)
+            elif callable(menu.items):
                 items = menu.items(handler, client, context, parameters)
             elif isinstance(menu.items, list):
                 items = menu.items
             else:
                 raise TypeError("items must be either callable or a list")
 
-            elements = items[parameters[page_id] * self.limit_items :][
-                : self.limit_items
-            ]
+            elements = items[parameters[page_id] * self.limit_items :][: self.limit_items]
 
             keyboard = [
                 [
@@ -210,9 +214,7 @@ class PageStyle(BaseStyle):
                 iter(
                     lambda: list(
                         map(
-                            lambda child: child.button(
-                                handler, client, context, parameters
-                            ),
+                            lambda child: child.button(handler, client, context, parameters),
                             islice(iterable, self.limit),
                         )
                     ),
@@ -235,14 +237,14 @@ class PageStyle(BaseStyle):
                 )
 
                 if menu.menu_id + "_id" in parameters:
-                    previous_page_button.parameters[
-                        menu.menu_id + "_id"
-                    ] = parameters[menu.menu_id + "_id"]
+                    previous_page_button.parameters[menu.menu_id + "_id"] = parameters[menu.menu_id + "_id"]
 
                 teleport_row.append(previous_page_button)
             else:
                 previous_page_button = Button(
-                    EMPTY_CHARACTER, str(parameters[page_id]), NULL_POINTER,
+                    EMPTY_CHARACTER,
+                    str(parameters[page_id]),
+                    NULL_POINTER,
                 )
 
                 teleport_row.append(previous_page_button)
@@ -257,9 +259,7 @@ class PageStyle(BaseStyle):
 
                     teleport_row.append(page_button)
                 else:
-                    page_button = Button(
-                        str(parameters[page_id] + 1), NULL_POINTER
-                    )
+                    page_button = Button(str(parameters[page_id] + 1), NULL_POINTER)
 
                     teleport_row.append(page_button)
 
@@ -273,24 +273,30 @@ class PageStyle(BaseStyle):
                 )
 
                 if menu.menu_id + "_id" in parameters:
-                    next_page_button.parameters[
-                        menu.menu_id + "_id"
-                    ] = parameters[menu.menu_id + "_id"]
+                    next_page_button.parameters[menu.menu_id + "_id"] = parameters[menu.menu_id + "_id"]
 
                 teleport_row.append(next_page_button)
             else:
                 next_page_button = Button(
-                    EMPTY_CHARACTER, str(parameters[page_id]), NULL_POINTER,
+                    EMPTY_CHARACTER,
+                    str(parameters[page_id]),
+                    NULL_POINTER,
                 )
 
                 teleport_row.append(next_page_button)
 
             keyboard += [teleport_row]
 
-        if parent:
+        if self.back_to:
+            parent = handler[self.back_to]
+
+        if parent and self.back_enable:
             parent_button = parent.button(handler, client, context, parameters)
             parent_button.name = self.back_text
 
-            keyboard += [[parent_button]]
+            extras = [handler[e] if isinstance(e, str) else e for e in self.extras]
+            buttons = [m.button(handler, client, context, parameters) for m in extras]
+
+            keyboard += [buttons, [parent_button]]
 
         return keyboard

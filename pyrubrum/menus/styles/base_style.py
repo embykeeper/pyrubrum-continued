@@ -28,7 +28,7 @@ class BaseStyle(ABC):
     """
 
     @abstractmethod
-    def generate(
+    async def generate(
         self,
         handler: "Handler",  # noqa
         client: Client,
