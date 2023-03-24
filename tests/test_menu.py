@@ -86,6 +86,9 @@ async def test_preliminary():
     async def preliminary_async(a, b, c, d, e=None):
         worked.append(1)
 
+    async def preliminary_async(a, b, c, d=None):
+        worked.append(1)
+
     menu = Menu("Test", "test", "test_content", preliminary=preliminary)
     await menu.on_callback(handler, None, context)
     await menu.on_message(handler, None, context)
