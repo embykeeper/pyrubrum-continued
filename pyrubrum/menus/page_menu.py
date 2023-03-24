@@ -96,11 +96,12 @@ class PageMenu(Menu):
         message_filter: Optional[Filter] = None,
         preliminary: Types.Preliminary = None,
         style: BaseStyle = PageStyle(),
+        **kwargs
     ):
         """Roughly equivalent to::
 
-            Menu(self, name, menu_id, content, default, message_filter,
-                 preliminary, style, items=items)
+        Menu(self, name, menu_id, content, default, message_filter,
+             preliminary, style, items=items)
         """
         Menu.__init__(
             self,
@@ -112,6 +113,7 @@ class PageMenu(Menu):
             message_filter=message_filter,
             preliminary=preliminary,
             style=style,
+            **kwargs
         )
 
         self.items = items

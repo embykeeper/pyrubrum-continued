@@ -66,9 +66,7 @@ class DeepLinkMenu(BaseMenu):
         deep_link_type: Optional[str] = "start",
     ):
         if deep_link_type not in PERMITTED_TYPES:
-            raise ValueError(
-                "deep_link_type must be either " "'start' or 'startgroup'"
-            )
+            raise ValueError("deep_link_type must be either " "'start' or 'startgroup'")
 
         BaseMenu.__init__(self, name, menu_id, is_link=True)
 

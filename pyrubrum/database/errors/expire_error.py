@@ -25,7 +25,4 @@ class ExpireError(DatabaseError):
     """
 
     def __init__(self):
-        super().__init__(
-            "An error occured while setting an expire to a key inside the"
-            "database"
-        )
+        super().__init__("An error occured while setting an expire to a key inside the" "database")

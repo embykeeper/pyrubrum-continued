@@ -100,8 +100,4 @@ class ParameterizedHandler(Handler, ParameterizedBaseHandler):
             )
 
         if default_menu:
-            client.add_handler(
-                MessageHandler(
-                    pass_parameterized_handler(default_menu.on_message, self)
-                )
-            )
+            client.add_handler(MessageHandler(pass_parameterized_handler(default_menu.on_message, self)))

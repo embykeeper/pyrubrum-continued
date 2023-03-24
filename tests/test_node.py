@@ -53,15 +53,11 @@ def same_node(n1, n2):
     assert isinstance(n2.children, tuple)
 
     if hash(n1) != hash(n2):
-        raise ValueError(
-            "different hash for either n1 (%d) or n2 (%d)"
-            % (hash(n1), hash(n2))
-        )
+        raise ValueError("different hash for either n1 (%d) or n2 (%d)" % (hash(n1), hash(n2)))
 
     if hash(n1.menu) != hash(n2.menu):
         raise ValueError(
-            "different hash for either n1.menu (%d) or "
-            "n2.menu (%d)" % (hash(n1.menu), hash(n2.menu))
+            "different hash for either n1.menu (%d) or " "n2.menu (%d)" % (hash(n1.menu), hash(n2.menu))
         )
 
     if len(n1.children) != len(n2.children):

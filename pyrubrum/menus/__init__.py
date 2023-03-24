@@ -22,3 +22,4 @@ from .link_menu import LinkMenu  # noqa
 from .menu import Menu  # noqa
 from .page_menu import PageMenu  # noqa
 from .styles import PageStyle  # noqa
+from .content_page_menu import ContentPageMenu  # noqa

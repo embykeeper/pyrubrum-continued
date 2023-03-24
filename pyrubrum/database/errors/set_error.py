@@ -25,7 +25,4 @@ class SetError(DatabaseError):
     """
 
     def __init__(self):
-        super().__init__(
-            "An error occured while setting a value to a certain key inside"
-            "the database"
-        )
+        super().__init__("An error occured while setting a value to a certain key inside" "the database")

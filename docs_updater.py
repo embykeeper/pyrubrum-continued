@@ -130,9 +130,7 @@ for directory, elements in entities.items():
     for element in elements:
         tree += " " * 4 + get_file_name(element) + "\n"
 
-    index = INDEX_TEMPLATE.format(
-        title=title, separators="=" * len(title), tree=tree
-    )
+    index = INDEX_TEMPLATE.format(title=title, separators="=" * len(title), tree=tree)
 
     path = os.path.join(dirname, "docs", "source", "api", directory)
 

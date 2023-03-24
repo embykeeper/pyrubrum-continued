@@ -98,9 +98,7 @@ def generate_changelog(repo: Repo):
 
             print(">>> FROM %s TO %s <<<" % (tag, next_tag))
 
-            commits = repo.iter_commits(
-                str(tag) + "..." + str(next_tag), reverse=True
-            )
+            commits = repo.iter_commits(str(tag) + "..." + str(next_tag), reverse=True)
 
             for commit in commits:
                 match = match_commit.search(commit.message.split("\n")[0])
@@ -108,16 +106,11 @@ def generate_changelog(repo: Repo):
                 if match:
                     type_commit = match.group(1)
                     breaking_change = match.group(2)
-                    breaking_change = (
-                        breaking_change if breaking_change else ""
-                    )
+                    breaking_change = breaking_change if breaking_change else ""
                     brief_message = match.group(3)
                     suffix = " "
 
-                    if (
-                        isinstance(breaking_change, str)
-                        and breaking_change == "!"
-                    ):
+                    if isinstance(breaking_change, str) and breaking_change == "!":
                         type_commit = "!"
 
                     if commit != repo.head.commit:
@@ -127,9 +120,7 @@ def generate_changelog(repo: Repo):
                         )
 
                     version_tree[next_tag][titles[type_commit]].append(
-                        (
-                            ("%s" + suffix) % upper_first_letter(brief_message)
-                        ).rstrip()
+                        (("%s" + suffix) % upper_first_letter(brief_message)).rstrip()
                     )
 
                     print(
@@ -142,13 +133,9 @@ def generate_changelog(repo: Repo):
     if "" in version_tree:
         version_tree[CURRENT_VERSION] = version_tree.pop("")
 
-    changelog_file = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), CHANGELOG_FILE
-    )
+    changelog_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), CHANGELOG_FILE)
 
-    features_file = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), FEATURES_FILE
-    )
+    features_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), FEATURES_FILE)
 
     with open(changelog_file, "w", encoding="utf-8") as f:
         f.write("# Changelog\n")
@@ -204,9 +191,7 @@ if __name__ == "__main__":
     origin_url = next(repo.remotes.origin.urls)
 
     if origin_url.startswith("https://"):
-        COMMIT_URL = (
-            origin_url.replace(".git/", "").replace(".git", "") + "/commit/%s"
-        )
+        COMMIT_URL = origin_url.replace(".git/", "").replace(".git", "") + "/commit/%s"
     else:
         match_url = commit_url_format.search(origin_url)
 

@@ -25,6 +25,4 @@ class GetError(DatabaseError):
     """
 
     def __init__(self):
-        super().__init__(
-            "An error occured while getting a key from the database"
-        )
+        super().__init__("An error occured while getting a key from the database")

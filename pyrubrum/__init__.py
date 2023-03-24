@@ -22,7 +22,7 @@ __copyright__ = "Copyright (C) 2020 Hearot <https://github.com/hearot>"
 __license__ = "GNU General Public License v3"
 __package__ = "pyrubrum"
 __url__ = "https://github.com/hearot/pyrubrum"
-__version__ = "0.1a3"
+__version__ = "0.2"
 
 from .database import BaseDatabase  # noqa
 from .database import DictDatabase  # noqa
@@ -47,6 +47,7 @@ from .menus import DeepLinkMenu  # noqa
 from .menus import LinkMenu  # noqa
 from .menus import Menu  # noqa
 from .menus import PageMenu  # noqa
+from .menus import ContentPageMenu  # noqa
 from .menus.styles import BaseStyle  # noqa
 from .menus.styles import MenuStyle  # noqa
 from .menus.styles import PageStyle  # noqa

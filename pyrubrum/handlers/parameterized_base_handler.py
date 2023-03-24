@@ -84,34 +84,21 @@ class ParameterizedBaseHandler(BaseHandler):
         def func(_, __, callback: CallbackQuery):
             if not hasattr(callback, "_result_data"):
                 try:
-                    callback._result_data = json.loads(
-                        self.database.get(callback.data)
-                    )
+                    callback._result_data = json.loads(self.database.get(callback.data))
 
-                    if (
-                        callback._result_data["from_chat_id"]
-                        == callback.message.chat.id
-                    ):
+                    if callback._result_data["from_chat_id"] == callback.message.chat.id:
                         self.database.delete(callback.data)
                 except (DatabaseError, JSONDecodeError):
                     return False
 
-            if (
-                callback._result_data["from_chat_id"]
-                != callback.message.chat.id
-            ):
+            if callback._result_data["from_chat_id"] != callback.message.chat.id:
                 return False
 
             if callback._result_data["menu_id"] == menu_id:
                 callback.parameters = callback._result_data
 
-                if (
-                    not callback.parameters["same_menu"]
-                    and callback.parameters["element_id"]
-                ):
-                    callback.parameters[menu_id + "_id"] = callback.parameters[
-                        "element_id"
-                    ]
+                if not callback.parameters["same_menu"] and callback.parameters["element_id"]:
+                    callback.parameters[menu_id + "_id"] = callback.parameters["element_id"]
 
                 return True
 
@@ -160,32 +147,18 @@ class ParameterizedBaseHandler(BaseHandler):
 
             for button in row:
                 if button.link:
-                    processed_row.append(
-                        InlineKeyboardButton(button.name, url=button.link)
-                    )
+                    processed_row.append(InlineKeyboardButton(button.name, url=button.link))
                     continue
 
                 if button.menu_id == NULL_POINTER:
-                    processed_row.append(
-                        InlineKeyboardButton(
-                            button.name, callback_data=NULL_POINTER
-                        )
-                    )
+                    processed_row.append(InlineKeyboardButton(button.name, callback_data=NULL_POINTER))
                     continue
 
                 key = md5(
-                    (
-                        str(callback_query_id)
-                        + button.menu_id
-                        + str(button.element_id)
-                    ).encode("utf-8")
+                    (str(callback_query_id) + button.menu_id + str(button.element_id)).encode("utf-8")
                 ).hexdigest()
 
-                content = (
-                    button.parameters
-                    if isinstance(button.parameters, dict)
-                    else {}
-                )
+                content = button.parameters if isinstance(button.parameters, dict) else {}
 
                 content.update(
                     {
@@ -196,9 +169,7 @@ class ParameterizedBaseHandler(BaseHandler):
                     }
                 )
 
-                processed_row.append(
-                    InlineKeyboardButton(button.name, callback_data=key)
-                )
+                processed_row.append(InlineKeyboardButton(button.name, callback_data=key))
 
                 self.database.set(key, json.dumps(content))
 
@@ -263,10 +234,10 @@ def pass_parameterized_handler(
             callback(handler, client, context, parameters)
     """
 
-    def on_callback(client: Client, context):
+    async def on_callback(client: Client, context):
         if isinstance(context, CallbackQuery):
-            func(handler, client, context, context.parameters)
+            await func(handler, client, context, context.parameters)
         else:
-            func(handler, client, context, {})
+            await func(handler, client, context, {})
 
     return on_callback

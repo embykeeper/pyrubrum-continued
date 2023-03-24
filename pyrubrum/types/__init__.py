@@ -26,9 +26,7 @@ from pyrubrum.keyboard.element import Element
 
 
 class Types:
-    Callback = Callable[
-        ["BaseHandler", Client, Any, Optional[Dict[str, Any]]], None
-    ]
+    Callback = Callable[["BaseHandler", Client, Any, Optional[Dict[str, Any]]], None]
     """This type defines the possible values for functions that work as
     callbacks in Pyrubrum (e.g. `on_callback`, `on_message`). They must
     implement the following pattern to be valid::
@@ -39,7 +37,8 @@ class Types:
     Content = Union[
         Union[InputMedia, str],
         Callable[
-            ["Handler", Client, Any, Dict[str, Any]], Union[InputMedia, str],
+            ["Handler", Client, Any, Dict[str, Any]],
+            Union[InputMedia, str],
         ],
     ]
     """This type defines the possible values for the content that is provided as
@@ -76,7 +75,8 @@ class Types:
     """
 
     Link = Union[
-        str, Callable[["Handler", Client, Any, Dict[str, Any]], str],
+        str,
+        Callable[["Handler", Client, Any, Dict[str, Any]], str],
     ]
     """This type defines the possible values for the link that is used to build
     an inline button that redirects to a website. A string is suitable for this
@@ -88,7 +88,8 @@ class Types:
     """
 
     Payload = Union[
-        str, Callable[["Handler", Client, Any, Dict[str, Any]], str],
+        str,
+        Callable[["Handler", Client, Any, Dict[str, Any]], str],
     ]
     """This type defines the possible values for the parameter that is passed
     to the bot using a deep-link. A string is suitable for this type to be

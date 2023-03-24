@@ -19,8 +19,7 @@
 from functools import lru_cache
 from typing import Iterable, Optional, Set, Tuple
 
-from pyrogram import Client
-from pyrogram.filters import Filter, create
+from pyrogram import Client, filters
 from pyrogram.handlers import MessageHandler
 
 from pyrubrum.menus import BaseMenu
@@ -31,14 +30,14 @@ from .base_handler import BaseHandler, pass_handler
 DEEP_LINK_FILTER_TEMPLATE = "/start %s"
 
 
-def command_filter(command: str) -> Filter:
+def command_filter(command: str) -> filters.Filter:
     """Generate a filter that matches all the text messages following this
     pattern::
 
         /[COMMAND]
 
-    Where ``COMMAND`` is the provided command. Unlike `Filters.command
-    <pyrogram.Filters.command>`, it does not match any deep-linked or
+    Where ``COMMAND`` is the provided command. Unlike `filters.Filters.command
+    <pyrogram.filters.Filters.command>`, it does not match any deep-linked or
     parameterized command.
 
     Parameters:
@@ -46,12 +45,12 @@ def command_filter(command: str) -> Filter:
         the prefix ``/``.
 
     Returns:
-        Filter: The generated filter.
+        filters.Filter: The generated filter.
     """
-    return create(lambda _, __, m: m.text == "/" + command, "DeepLinkFilter")
+    return filters.create(lambda _, __, m: m.text == "/" + command, "DeepLinkFilter")
 
 
-def deep_link_filter(payload: str) -> Filter:
+def deep_link_filter(payload: str) -> filters.Filter:
     """Generate a filter that matches all the text messages following this
     pattern::
 
@@ -63,10 +62,10 @@ def deep_link_filter(payload: str) -> Filter:
         payload (str): The payload that has to be matched.
 
     Returns:
-        Filter: The generated filter.
+        filters.Filter: The generated filter.
     """
     match = DEEP_LINK_FILTER_TEMPLATE % payload
-    return create(lambda _, __, m: m.text == match, "DeepLinkFilter")
+    return filters.create(lambda _, __, m: m.text == match, "DeepLinkFilter")
 
 
 class Handler(BaseHandler):
@@ -89,9 +88,7 @@ class Handler(BaseHandler):
         self.nodes = nodes
 
     @lru_cache()
-    def get_family(
-        self, menu_id: str
-    ) -> Tuple[Optional[BaseMenu], Optional[Iterable[BaseMenu]]]:
+    def get_family(self, menu_id: str) -> Tuple[Optional[BaseMenu], Optional[Iterable[BaseMenu]]]:
         """Retrieve the menus which are linked to both parent and children of the
         :term:`top-level nodes <Top-level node>` of this instance if this
         instance matches the provided identifier. Otherwise it will search the
@@ -136,6 +133,13 @@ class Handler(BaseHandler):
 
         return menus
 
+    def __getitem__(self, key) -> BaseMenu:
+        for menu in self.get_menus():
+            if menu.menu_id == key:
+                return menu
+        else:
+            raise KeyError(key)
+
     def setup(self, client: Client):
         """Set up a client instance by adding filters for handling callbacks and
         messages. If there is a default menu, it adds it using
@@ -169,6 +173,4 @@ class Handler(BaseHandler):
             )
 
         if default_menu:
-            client.add_handler(
-                MessageHandler(pass_handler(default_menu.on_message, self))
-            )
+            client.add_handler(MessageHandler(pass_handler(default_menu.on_message, self)))

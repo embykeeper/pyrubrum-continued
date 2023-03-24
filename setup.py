@@ -19,8 +19,7 @@
 
 import re
 
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 
 GITHUB_REPOSITORY = "https://github.com/hearot/pyrubrum/blob/v%s/"
 
@@ -69,13 +68,13 @@ setup(
     license="GPLv3",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    name="Pyrubrum",
+    name="pyrubrum-continued",
     packages=find_packages(),
     project_urls={
         "Tracker": "https://github.com/hearot/pyrubrum/issues",
         "Source": "https://github.com/hearot/pyrubrum",
     },
-    python_requires=">=3.6.*",
+    python_requires=">=3.6",
     url="https://github.com/hearot/pyrubrum",
     version=version,
 )

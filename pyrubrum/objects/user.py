@@ -118,9 +118,7 @@ class User(dict):
             parameters (Optional[Dict[str, Any]]): The parameters which were
                 passed to the handler. Defaults to ``None``.
         """
-        context.current_user = cls.get_or_create(
-            handler.database, context.from_user.id
-        )
+        context.current_user = cls.get_or_create(handler.database, context.from_user.id)
 
     def save(self, database: BaseDatabase):
         """Save the `User` object to the the database using the following pattern
