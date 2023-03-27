@@ -87,7 +87,7 @@ class ContentPageMenu(PageMenu):
         if not self.entries:
             return
         else:
-            text = "\n".join([c for c, t, x in self.entries[page - 1]])
+            text = "\n".join([c for c, t, x in self.entries[page]])
             if self.header:
                 text = await self.parse(self.header, handler, client, context, parameters) + "\n" + text
             if self.footer:
