@@ -50,20 +50,6 @@ class ContentPageMenu(PageMenu):
         for ndx in range(0, l, n):
             yield iterable[ndx : min(ndx + n, l)]
 
-    async def get_content(self, handler, client, context, parameters):
-        if not self.entries:
-            if iscoroutinefunction(self.content):
-                content = await self.content(handler, client, context, parameters)
-            elif callable(self.content):
-                content = self.content(handler, client, context, parameters)
-            else:
-                content = self.content
-            if content:
-                self.entries = list(self.batch(content, self.style.limit_items))
-            else:
-                return None
-        return self.entries
-
     async def on_update(
         self,
         handler: "Handler",  # noqa
@@ -74,24 +60,24 @@ class ContentPageMenu(PageMenu):
         key = f"page_{self.menu_id}"
         page = int(parameters.get(key, 0))
 
+        content = await self.parse(self.content, handler, client, context, parameters)
+        if not content:
+            return
+
         if (not self.entries) or (not parameters.get("same_menu", False)):
             self.entries = list(
                 self.batch(
-                    await self.parse(self.content, handler, client, context, parameters),
+                    content,
                     self.style.limit_items,
                 )
             )
 
         await self.call_preliminary(handler, client, context, parameters)
-
-        if not self.entries:
-            return
-        else:
-            text = "\n".join([c for c, t, x in self.entries[page]])
-            if self.header:
-                text = await self.parse(self.header, handler, client, context, parameters) + "\n" + text
-            if self.footer:
-                text = text + "\n" + await self.parse(self.footer, handler, client, context, parameters)
+        text = "\n".join([c for c, t, x in self.entries[page]])
+        if self.header:
+            text = await self.parse(self.header, handler, client, context, parameters) + "\n" + text
+        if self.footer:
+            text = text + "\n" + await self.parse(self.footer, handler, client, context, parameters)
 
         self.items = [Element(t, x) for page in self.entries for c, t, x in page]
         keyboard = await self.keyboard(handler, client, context, parameters)
