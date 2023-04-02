@@ -58,7 +58,7 @@ class ContentPageMenu(PageMenu):
         parameters: Optional[Dict[str, Any]] = None,
     ):
         key = f"page_{self.menu_id}"
-        page = int(parameters.get(key, 1))
+        page = int(parameters.get(key, 1)) if parameters.get("same_menu", False) else 1
 
         content = await self.parse(self.content, handler, client, context, parameters)
         if not content:
