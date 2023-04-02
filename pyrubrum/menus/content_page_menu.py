@@ -1,4 +1,5 @@
 from asyncio import iscoroutinefunction
+import asyncio
 from typing import Any, Dict, Optional, Tuple, Union
 
 from pyrogram import Client
@@ -72,12 +73,15 @@ class ContentPageMenu(PageMenu):
                 )
             )
 
-        await self.call_preliminary(handler, client, context, parameters)
-        text = "\n".join([c for c, t, x in self.entries[page - 1]])
+        for c, _, __ in self.entries[page - 1]:
+            self.entries[page - 1][0] = self.parse(c, handler, client, context, parameters)
+
+        text = "\n".join([c for c, _, __ in self.entries[page - 1]])
         if self.header:
             text = await self.parse(self.header, handler, client, context, parameters) + "\n" + text
         if self.footer:
             text = text + "\n" + await self.parse(self.footer, handler, client, context, parameters)
+        await self.call_preliminary(handler, client, context, parameters)
 
         self.items = [Element(t, x) for page in self.entries for c, t, x in page]
         keyboard = await self.keyboard(handler, client, context, parameters)
