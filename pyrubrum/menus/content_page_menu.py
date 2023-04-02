@@ -58,7 +58,7 @@ class ContentPageMenu(PageMenu):
         context: Union[CallbackQuery, Message],
         parameters: Optional[Dict[str, Any]] = None,
     ):
-        page = int(parameters.get('element_id', '') or 0)
+        page = int(parameters.get('element_id', '') or parameters.get(f'page_{self.menu_id}', 0))
 
         content = await self.parse(self.content, handler, client, context, parameters)
         if not content:
