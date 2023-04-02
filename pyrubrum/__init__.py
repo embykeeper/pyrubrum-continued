@@ -22,7 +22,7 @@ __copyright__ = "Copyright (C) 2020 Hearot <https://github.com/hearot>"
 __license__ = "GNU General Public License v3"
 __package__ = "pyrubrum"
 __url__ = "https://github.com/hearot/pyrubrum"
-__version__ = "0.2.7"
+__version__ = "0.2.8"
 
 from .database import BaseDatabase  # noqa
 from .database import DictDatabase  # noqa

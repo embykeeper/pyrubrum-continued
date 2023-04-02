@@ -59,7 +59,7 @@ class ContentPageMenu(PageMenu):
         parameters: Optional[Dict[str, Any]] = None,
     ):
         key = f"page_{self.menu_id}"
-        page = int(parameters.get(key, 1))
+        page = int(parameters.get(key, 0))
 
         content = await self.parse(self.content, handler, client, context, parameters)
         if not content:
@@ -73,10 +73,10 @@ class ContentPageMenu(PageMenu):
                 )
             )
 
-        for i, (c, t, x) in enumerate(self.entries[page - 1]):
-            self.entries[page - 1][i] = (await self.parse(c, handler, client, context, parameters), t, x)
+        for i, (c, t, x) in enumerate(self.entries[page]):
+            self.entries[page][i] = (await self.parse(c, handler, client, context, parameters), t, x)
 
-        text = "\n".join([c for c, t, x in self.entries[page - 1]])
+        text = "\n".join([c for c, t, x in self.entries[page]])
         if self.header:
             text = await self.parse(self.header, handler, client, context, parameters) + "\n" + text
         if self.footer:
