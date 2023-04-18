@@ -175,7 +175,7 @@ class ParameterizedBaseHandler(BaseHandler):
 
         return processed_keyboard
 
-    def setup(self, client: Client):
+    def setup(self, client: Client, group=0):
         """Make all the defined menus reachable by the client by adding handlers that
         catch all their identifiers to it. It adds support to parameterization
         by applying `ParameterizedBaseHandler.filter` to all the handled
@@ -202,7 +202,8 @@ class ParameterizedBaseHandler(BaseHandler):
                 CallbackQueryHandler(
                     pass_parameterized_handler(menu.on_callback, self),
                     self.filter(menu.menu_id),
-                )
+                ),
+                group=0,
             )
 
 

@@ -99,7 +99,7 @@ class BaseHandler(ABC):
             for row in keyboard
         ]
 
-    def setup(self, client: Client):
+    def setup(self, client: Client, group=0):
         """Make all the defined menus reachable by the client by adding handlers that
         catch all their identifiers to it. It also calls `pass_handler`, which
         lets the callback functions get this handler as argument.
@@ -122,7 +122,8 @@ class BaseHandler(ABC):
                 CallbackQueryHandler(
                     pass_handler(menu.on_callback, self),
                     callback_data_filter(menu.menu_id),
-                )
+                ),
+                group=group,
             )
 
 

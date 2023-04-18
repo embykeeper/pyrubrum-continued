@@ -53,7 +53,7 @@ class ParameterizedHandler(Handler, ParameterizedBaseHandler):
         Handler.__init__(self, nodes)
         ParameterizedBaseHandler.__init__(self, database)
 
-    def setup(self, client: Client):
+    def setup(self, client: Client, group=0):
         """Make all the defined menus reachable by the client by adding handlers that
         catch all their identifiers to it. It adds support to parameterization
         by applying `ParameterizedBaseHandler.filter` to all the handled
@@ -96,8 +96,11 @@ class ParameterizedHandler(Handler, ParameterizedBaseHandler):
                 MessageHandler(
                     pass_parameterized_handler(node.menu.on_message, self),
                     node.menu.message_filter,
-                )
+                ),
+                group=group,
             )
 
         if default_menu:
-            client.add_handler(MessageHandler(pass_parameterized_handler(default_menu.on_message, self)))
+            client.add_handler(
+                MessageHandler(pass_parameterized_handler(default_menu.on_message, self)), group=group
+            )

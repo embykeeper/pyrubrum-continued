@@ -58,9 +58,9 @@ class ContentPageMenu(PageMenu):
         context: Union[CallbackQuery, Message],
         parameters: Optional[Dict[str, Any]] = None,
     ):
-        element_id = parameters.get('element_id', '')
-        if element_id == '':
-            page = int(parameters.get(f'page_{self.menu_id}', 0))
+        element_id = parameters.get("element_id", "")
+        if element_id == "":
+            page = int(parameters.get(f"page_{self.menu_id}", 0))
         else:
             page = int(element_id)
 

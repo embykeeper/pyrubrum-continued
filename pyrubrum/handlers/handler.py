@@ -140,7 +140,7 @@ class Handler(BaseHandler):
         else:
             raise KeyError(key)
 
-    def setup(self, client: Client):
+    def setup(self, client: Client, group=group):
         """Set up a client instance by adding filters for handling callbacks and
         messages. If there is a default menu, it adds it using
         `MessageHandler <pyrogram.MessageHandler>`.
@@ -169,8 +169,9 @@ class Handler(BaseHandler):
                 MessageHandler(
                     pass_handler(node.menu.on_message, self),
                     node.menu.message_filter,
-                )
+                ),
+                group=group,
             )
 
         if default_menu:
-            client.add_handler(MessageHandler(pass_handler(default_menu.on_message, self)))
+            client.add_handler(MessageHandler(pass_handler(default_menu.on_message, self)), group=group)
