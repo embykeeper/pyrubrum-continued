@@ -203,7 +203,7 @@ class ParameterizedBaseHandler(BaseHandler):
                     pass_parameterized_handler(menu.on_callback, self),
                     self.filter(menu.menu_id),
                 ),
-                group=0,
+                group=group,
             )
 
 
