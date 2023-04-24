@@ -65,7 +65,7 @@ class ContentPageMenu(PageMenu):
             page = int(element_id)
 
         content = await self.parse(self.content, handler, client, context, parameters)
-        if not content:
+        if content is None:
             return
 
         if (not self.entries) or (not parameters.get("same_menu", False)):

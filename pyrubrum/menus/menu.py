@@ -155,7 +155,7 @@ class Menu(BaseMenu):
 
         keyboard = await self.keyboard(handler, client, context, parameters)
         content = await self.parse(self.content, handler, client, context, parameters)
-        if not content:
+        if content is None:
             return
 
         if isinstance(context, Message):
