@@ -76,10 +76,11 @@ class ContentPageMenu(PageMenu):
                 )
             )
 
-        for i, (c, t, x) in enumerate(self.entries[page]):
-            self.entries[page][i] = (await self.parse(c, handler, client, context, parameters), t, x)
+        if self.entries:
+            for i, (c, t, x) in enumerate(self.entries[page]):
+                self.entries[page][i] = (await self.parse(c, handler, client, context, parameters), t, x)
 
-        text = "\n".join([c for c, t, x in self.entries[page]])
+        text = "\n".join([c for c, t, x in self.entries[page]]) if self.entries else ''
         if self.header:
             text = await self.parse(self.header, handler, client, context, parameters) + "\n" + text
         if self.footer:
