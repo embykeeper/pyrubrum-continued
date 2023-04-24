@@ -93,16 +93,16 @@ class MenuStyle(BaseStyle):
                 )
             )
 
+        extras = [handler[e] if isinstance(e, str) else e for e in self.extras]
+        buttons = [m.button(handler, client, context, parameters) for m in extras]
+        keyboard += [buttons]
+
         if self.back_to:
             parent = handler[self.back_to]
-
+        
         if parent and self.back_enable:
             parent_button = parent.button(handler, client, context, parameters)
             parent_button.name = self.back_text
-
-            extras = [handler[e] if isinstance(e, str) else e for e in self.extras]
-            buttons = [m.button(handler, client, context, parameters) for m in extras]
-
-            keyboard += [buttons, [parent_button]]
+            keyboard += [[parent_button]]
 
         return keyboard
