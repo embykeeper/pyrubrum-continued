@@ -167,7 +167,7 @@ class Menu(BaseMenu):
                 await context.reply_text(content, reply_markup=keyboard, **self.kwargs)
         elif isinstance(context, CallbackQuery):
             if isinstance(content, InputMedia):
-                await context.edit_message_media(content, reply_markup=keyboard, **self.kwargs)
+                await context.edit_message_media(content, reply_markup=keyboard)
             else:
                 await context.edit_message_text(content, reply_markup=keyboard, **self.kwargs)
 
