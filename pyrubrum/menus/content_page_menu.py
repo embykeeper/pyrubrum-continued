@@ -61,8 +61,10 @@ class ContentPageMenu(PageMenu):
         element_id = parameters.get("element_id", "")
         if element_id == "":
             page = int(parameters.get(f"page_{self.menu_id}", 0))
-        else:
+        elif parameters.get('same_menu', False):
             page = int(element_id)
+        else:
+            page = 0
 
         content = await self.parse(self.content, handler, client, context, parameters)
         if content is None:
