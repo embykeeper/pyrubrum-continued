@@ -104,7 +104,7 @@ class MenuStyle(BaseStyle):
         if parent and self.back_enable:
             parent_button = parent.button(handler, client, context, parameters)
             parent_button.name = self.back_text
-            if buttons:
+            if parent_button:
                 keyboard += [[parent_button]]
 
         return keyboard
