@@ -75,23 +75,16 @@ class MenuStyle(BaseStyle):
             pyrogram.InlineKeyboardMarkup: The generated inline keyboard,
             which is then displayed to the user.
         """
+        async def get_button(menu):
+            return await menu.button(handler, client, context, parameters)
+        
         parent, children = handler.get_family(menu.menu_id)
 
         keyboard = []
 
         if children:
             iterable = iter(children)
-            keyboard = list(
-                iter(
-                    lambda: list(
-                        map(
-                            lambda child: await child.button(handler, client, context, parameters),
-                            islice(iterable, self.limit),
-                        )
-                    ),
-                    [],
-                )
-            )
+            keyboard = [await child.button(handler, client, context, parameters) for child in islice(iterable, self.limit)]
 
         extras = [handler[e] if isinstance(e, str) else e for e in self.extras]
         buttons = [await m.button(handler, client, context, parameters) for m in extras]

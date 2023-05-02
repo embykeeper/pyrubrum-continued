@@ -109,7 +109,7 @@ class DeepLinkMenu(BaseMenu):
             self.menu_id,
             link=DEEP_LINK_TEMPLATE.format(
                 deep_link_type=self.deep_link_type,
-                payload=await self.parse(self.payload),
+                payload=await self.parse(self.payload, handler, client, context, parameters),
                 username=username,
             ),
         )
