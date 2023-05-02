@@ -85,10 +85,12 @@ class MenuStyle(BaseStyle):
 
         if children:
             iterable = iter(children)
-            keyboard = [
-                await child.button(handler, client, context, parameters)
-                for child in islice(iterable, self.limit)
-            ]
+            while True:
+                b = list(islice(iterable, self.limit))
+                if not b:
+                    break
+                else:
+                    keyboard += [[await child.button(handler, client, context, parameters) for child in b]]
 
         extras = [handler[e] if isinstance(e, str) else e for e in self.extras]
         buttons = [await m.button(handler, client, context, parameters) for m in extras]
