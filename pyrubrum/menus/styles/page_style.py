@@ -210,7 +210,10 @@ class PageStyle(BaseStyle):
             ]
 
         if children:
-            keyboard += [await child.button(handler, client, context, parameters) for child in islice(iterable, self.limit)]
+            keyboard += [
+                await child.button(handler, client, context, parameters)
+                for child in islice(iterable, self.limit)
+            ]
 
         pages = ceil(len(items) / self.limit_items)
 

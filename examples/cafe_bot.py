@@ -72,7 +72,12 @@ def make_elements(elements: List[str]) -> List[Element]:
 
 tree = transform(
     {
-        Menu("Start", "start", "ℹ️ Have a drink or a snack by saying /drink or /snack", default=True,): [
+        Menu(
+            "Start",
+            "start",
+            "ℹ️ Have a drink or a snack by saying /drink or /snack",
+            default=True,
+        ): [
             DeepLinkMenu("🍷 Drink", "link_drink", "drink"),
             DeepLinkMenu("🍬 Snack", "link_snack", "snack"),
         ],

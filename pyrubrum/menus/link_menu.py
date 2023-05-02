@@ -75,4 +75,6 @@ class LinkMenu(BaseMenu):
             Button: The generated button.
         """
 
-        return Button(self.name, self.menu_id, link=await self.parse(self.link, handler, client, context, parameters))
+        return Button(
+            self.name, self.menu_id, link=await self.parse(self.link, handler, client, context, parameters)
+        )

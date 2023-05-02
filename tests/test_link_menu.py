@@ -23,6 +23,7 @@ from pyrubrum import LinkMenu
 example_link = "https://example.com"
 example_name = "Example"
 
+
 @pytest.mark.asyncio
 async def test_button():
     link = LinkMenu(example_name, "test", example_link)
@@ -31,6 +32,7 @@ async def test_button():
     assert button.link == example_link
     assert not hasattr(button, "menu_id")
     assert button.name == example_name
+
 
 @pytest.mark.asyncio
 async def test_button_with_function():

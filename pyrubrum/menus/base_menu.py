@@ -74,7 +74,7 @@ class BaseMenu(ABC):
         self.is_link = is_link
         self.name = name
         self.menu_id = menu_id
-    
+
     @staticmethod
     async def parse(var, handler, client, context, parameters):
         if iscoroutinefunction(var):

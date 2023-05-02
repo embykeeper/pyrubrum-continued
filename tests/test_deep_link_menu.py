@@ -30,6 +30,7 @@ payload = "test_payload"
 
 expected_deep_link = "https://t.me/%s?start=%s" % (username_test, payload)
 
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("deep_type", PERMITTED_TYPES | {"fancytype"})
 async def test_deep_link_menu(deep_type):
@@ -40,6 +41,7 @@ async def test_deep_link_menu(deep_type):
         with pytest.raises(ValueError):
             DeepLinkMenu("Test", "test", payload, deep_type)
 
+
 @pytest.mark.asyncio
 async def test_button():
     menu = DeepLinkMenu("Test", "test", payload)
@@ -48,6 +50,7 @@ async def test_button():
     assert button.link == expected_deep_link
     assert not hasattr(button, "menu_id")
     assert button.name == "Test"
+
 
 @pytest.mark.asyncio
 async def test_button_with_function():

@@ -61,7 +61,7 @@ class ContentPageMenu(PageMenu):
         element_id = parameters.get("element_id", "")
         if element_id == "":
             page = int(parameters.get(f"page_{self.menu_id}", 0))
-        elif parameters.get('same_menu', False):
+        elif parameters.get("same_menu", False):
             page = int(element_id)
         else:
             page = 0
@@ -82,7 +82,7 @@ class ContentPageMenu(PageMenu):
             for i, (c, t, x) in enumerate(self.entries[page]):
                 self.entries[page][i] = (await self.parse(c, handler, client, context, parameters), t, x)
 
-        text = "\n".join([c for c, t, x in self.entries[page]]) if self.entries else ''
+        text = "\n".join([c for c, t, x in self.entries[page]]) if self.entries else ""
         if self.header:
             text = await self.parse(self.header, handler, client, context, parameters) + "\n" + text
         if self.footer:
