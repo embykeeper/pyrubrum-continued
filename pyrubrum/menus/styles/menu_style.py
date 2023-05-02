@@ -85,7 +85,7 @@ class MenuStyle(BaseStyle):
                 iter(
                     lambda: list(
                         map(
-                            lambda child: child.button(handler, client, context, parameters),
+                            lambda child: await child.button(handler, client, context, parameters),
                             islice(iterable, self.limit),
                         )
                     ),
@@ -94,7 +94,7 @@ class MenuStyle(BaseStyle):
             )
 
         extras = [handler[e] if isinstance(e, str) else e for e in self.extras]
-        buttons = [m.button(handler, client, context, parameters) for m in extras]
+        buttons = [await m.button(handler, client, context, parameters) for m in extras]
         if buttons:
             keyboard += [buttons]
 
@@ -102,7 +102,7 @@ class MenuStyle(BaseStyle):
             parent = handler[self.back_to]
         
         if parent and self.back_enable:
-            parent_button = parent.button(handler, client, context, parameters)
+            parent_button = await parent.button(handler, client, context, parameters)
             parent_button.name = self.back_text
             if parent_button:
                 keyboard += [[parent_button]]

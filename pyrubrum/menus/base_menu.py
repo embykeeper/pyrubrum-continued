@@ -17,6 +17,7 @@
 # along with Pyrubrum. If not, see <https://www.gnu.org/licenses/>.
 
 from abc import ABC
+from asyncio import iscoroutinefunction
 from typing import Any, Dict, Optional
 
 from pyrogram import Client
@@ -73,8 +74,17 @@ class BaseMenu(ABC):
         self.is_link = is_link
         self.name = name
         self.menu_id = menu_id
+    
+    @staticmethod
+    async def parse(var, handler, client, context, parameters):
+        if iscoroutinefunction(var):
+            return await var(handler, client, context, parameters)
+        elif callable(var):
+            return var(handler, client, context, parameters)
+        else:
+            return var
 
-    def button(
+    async def button(
         self,
         handler: BaseHandler,
         client: Client,

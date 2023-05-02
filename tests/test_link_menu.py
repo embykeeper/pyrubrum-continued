@@ -16,24 +16,26 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Pyrubrum. If not, see <http://www.gnu.org/licenses/>.
 
+import pytest
+
 from pyrubrum import LinkMenu
 
 example_link = "https://example.com"
 example_name = "Example"
 
-
-def test_button():
+@pytest.mark.asyncio
+async def test_button():
     link = LinkMenu(example_name, "test", example_link)
-    button = link.button(None, None, None)
+    button = await link.button(None, None, None)
 
     assert button.link == example_link
     assert not hasattr(button, "menu_id")
     assert button.name == example_name
 
-
-def test_button_with_function():
+@pytest.mark.asyncio
+async def test_button_with_function():
     link = LinkMenu(example_name, "test", lambda a, b, c, d: example_link)
-    button = link.button(None, None, None)
+    button = await link.button(None, None, None)
 
     assert button.link == example_link
     assert not hasattr(button, "menu_id")

@@ -52,7 +52,7 @@ class LinkMenu(BaseMenu):
 
         self.link = link
 
-    def button(
+    async def button(
         self,
         handler: "BaseHandler",  # noqa
         client: "Client",  # noqa
@@ -74,11 +74,5 @@ class LinkMenu(BaseMenu):
         Returns:
             Button: The generated button.
         """
-        if callable(self.link):
-            return Button(
-                self.name,
-                self.menu_id,
-                link=self.link(handler, client, context, parameters),
-            )
 
-        return Button(self.name, self.menu_id, link=self.link)
+        return Button(self.name, self.menu_id, link=await self.parse(self.link))

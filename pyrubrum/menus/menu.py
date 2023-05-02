@@ -118,15 +118,6 @@ class Menu(BaseMenu):
         self.style = style
         self.kwargs = kwargs
 
-    @staticmethod
-    async def parse(var, handler, client, context, parameters):
-        if iscoroutinefunction(var):
-            return await var(handler, client, context, parameters)
-        elif callable(var):
-            return var(handler, client, context, parameters)
-        else:
-            return var
-
     async def call_preliminary(
         self,
         handler: "Handler",  # noqa

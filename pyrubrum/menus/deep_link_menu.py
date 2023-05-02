@@ -73,7 +73,7 @@ class DeepLinkMenu(BaseMenu):
         self.payload = payload
         self.deep_link_type = deep_link_type
 
-    def button(
+    async def button(
         self,
         handler: "BaseHandler",  # noqa
         client: "Client",  # noqa
@@ -104,23 +104,12 @@ class DeepLinkMenu(BaseMenu):
             username = client.get_me().username
             USERNAMES[client_hash] = username
 
-        if callable(self.payload):
-            return Button(
-                self.name,
-                self.menu_id,
-                link=DEEP_LINK_TEMPLATE.format(
-                    deep_link_type=self.deep_link_type,
-                    payload=self.payload(handler, client, context, parameters),
-                    username=username,
-                ),
-            )
-
         return Button(
             self.name,
             self.menu_id,
             link=DEEP_LINK_TEMPLATE.format(
                 deep_link_type=self.deep_link_type,
-                payload=self.payload,
+                payload=await self.parse(self.payload),
                 username=username,
             ),
         )
