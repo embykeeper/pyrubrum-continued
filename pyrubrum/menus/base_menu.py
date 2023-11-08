@@ -107,4 +107,7 @@ class BaseMenu(ABC):
         Returns:
             Button: The generated button.
         """
-        return Button(self.name, self.menu_id, parameters)
+        
+        name = await self.parse(self.name, handler, client, context, parameters)
+        
+        return Button(name, self.menu_id, parameters)

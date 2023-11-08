@@ -104,8 +104,10 @@ class DeepLinkMenu(BaseMenu):
             username = client.get_me().username
             USERNAMES[client_hash] = username
 
+        name = await self.parse(self.name, handler, client, context, parameters)
+
         return Button(
-            self.name,
+            name,
             self.menu_id,
             link=DEEP_LINK_TEMPLATE.format(
                 deep_link_type=self.deep_link_type,
